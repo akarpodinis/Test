@@ -25,6 +25,7 @@
     self.textField.backgroundColor = [UIColor clearColor];
     self.textField.delegate = self;
     self.textField.borderStyle = UITextBorderStyleRoundedRect;
+    self.textField.text = @"@bob @john (success) such a cool feature; https://google.com";
     [container addSubview:self.textField];
 	
     UIButton *button = [UIButton buttonWithType:UIButtonTypeRoundedRect];
@@ -45,7 +46,6 @@
     
     [container addSubview:self.outputField];
     [self.view addSubview:container];
-    //    [self getJsonFromString:@"@bob @john (success) such a cool feature; https://twitter.com/jdorfman/status/430511497475670016"];
     
 }
 
@@ -75,16 +75,23 @@
             }
         } else if (linkRange.location != NSNotFound) {
             NSURL *sUrl = [NSURL URLWithString:str];
-            NSString *s = [NSString stringWithContentsOfURL:sUrl encoding:NSASCIIStringEncoding error:nil];
-            NSRange titleStartRange = [s rangeOfString:@"<title>" options:NSCaseInsensitiveSearch];
-            NSRange titleEndRange = [s rangeOfString:@"</title>" options:NSCaseInsensitiveSearch];
-            NSString *siteTitle = @"";
-            if (titleStartRange.location != NSNotFound) {
-                siteTitle = [s substringWithRange:NSMakeRange(titleStartRange.location+titleStartRange.length, titleEndRange.location - titleStartRange.location - titleEndRange.length)];
+            NSError *errorURL;
+            NSString *s = [NSString stringWithContentsOfURL:sUrl encoding:NSASCIIStringEncoding error:&errorURL];
+            if (!errorURL) {
+                NSRange titleStartRange = [s rangeOfString:@"<title>" options:NSCaseInsensitiveSearch];
+                NSRange titleEndRange = [s rangeOfString:@"</title>" options:NSCaseInsensitiveSearch];
+                NSString *siteTitle = @"";
+                if (titleStartRange.location != NSNotFound) {
+                    siteTitle = [s substringWithRange:NSMakeRange(titleStartRange.location+titleStartRange.length, titleEndRange.location - titleStartRange.location - titleEndRange.length)];
+                    if (![siteTitle isEqualToString:@""]) {
+                        NSDictionary *linkDict = @{@"url":str, @"title":siteTitle};
+                        [arrayLinks addObject:linkDict];
+                    }
+                }
+            } else {
+                NSDictionary *linkDict = @{@"url":str, @"title":@"Title not found"};
+                [arrayLinks addObject:linkDict];
             }
-            
-            NSDictionary *linkDict = @{@"url":str, @"title":siteTitle};
-            [arrayLinks addObject:linkDict];
             
         } else {
             continue;
@@ -108,6 +115,7 @@
 	if(!error) {
 	
 		NSString * myString = [[NSString alloc] initWithData:jsonData encoding:NSUTF8StringEncoding];
+        myString = [myString stringByReplacingOccurrencesOfString:@"\\/" withString:@"/"];
         self.outputField.text = myString;
 	}
 }
