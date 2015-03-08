@@ -82,7 +82,7 @@
                 NSRange titleEndRange = [s rangeOfString:@"</title>" options:NSCaseInsensitiveSearch];
                 NSString *siteTitle = @"";
                 if (titleStartRange.location != NSNotFound) {
-                    siteTitle = [s substringWithRange:NSMakeRange(titleStartRange.location+titleStartRange.length, titleEndRange.location - titleStartRange.location - titleEndRange.length)];
+                    siteTitle = [s substringWithRange:NSMakeRange(titleStartRange.location+titleStartRange.length, titleEndRange.location - titleStartRange.location - titleEndRange.length + 1)];
                     if (![siteTitle isEqualToString:@""]) {
                         NSDictionary *linkDict = @{@"url":str, @"title":siteTitle};
                         [arrayLinks addObject:linkDict];
