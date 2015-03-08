@@ -2,7 +2,7 @@
 //  AppDelegate.h
 //  Test
 //
-//  Created by Gaurika Gupta on 3/6/15.
+//  Created by Neha Mittal on 3/6/15.
 //  Copyright (c) 2015 Neha Mittal. All rights reserved.
 //
 
